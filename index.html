@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" type="text/css" href="src/style.css">
+    <script src="src/script.js"></script>
+</head>
+<body>
+<div id="container"></div>
+<div class="controls_wrap">
+    <button class="show-controls"><</button>
+    <div class="patterns_wrap"></div>
+    <div class="history_wrap"></div>
+    <div class="buttons_wrap">
+        <button class="button" id="init">Init</button>
+        <button class="button" id="start">Start</button>
+        <button class="button" id="stop">Stop</button>
+    </div>
+</div>
+</body>
+<script>
+    let Game = new GameOfLife("main");
+</script>
+</html>
