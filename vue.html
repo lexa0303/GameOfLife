@@ -4,26 +4,47 @@
     <meta charset="UTF-8">
     <title>Vue</title>
     <link rel="stylesheet" type="text/css" href="src/style.css">
-    <script src="https://unpkg.com/vue"></script>
+    <!--<script src="src/external/vue/vue2.3.2.js"></script>-->
 </head>
 <body>
 <div id="container">
-    <div class="cell"
-         :class="{alive: cell.isAlive, dead : !cell.isAlive}"
-         v-for="cell in cells"
-         :style="cell.style"
-         v-on:click="switchAlive(cell)"></div>
-</div>
-<div class="controls_wrap">
-    <button class="show-controls"><</button>
-    <div class="patterns_wrap"></div>
-    <div class="history_wrap"></div>
-    <div class="buttons_wrap">
-        <button class="button" id="init">Init</button>
-        <button class="button" id="start">Start</button>
-        <button class="button" id="stop">Stop</button>
+    <div class="cells_wrap">
+        <div class="cell"
+             :class="{alive: cell.isAlive, dead : !cell.isAlive}"
+             v-for="cell in cells"
+             :style="cell.style"
+             v-on:click="switchAlive(cell)"></div>
+    </div>
+    <div class="controls_wrap">
+        <button class="show-controls"><</button>
+        <div class="patterns_wrap"></div>
+        <div class="history_wrap">
+            <div class="history_list"></div>
+            <div class="history_controls">
+                <button class="history_save">Save Status</button>
+            </div>
+        </div>
+        <div class="buttons_wrap">
+            <input type="number"
+                   name="speed_of_life"
+                   v-on:change="changeSpeed"
+                   min="200"
+                   max="5000"
+                   v-default-value="game.speed_of_life"
+                   id="speed_of_life-text">
+            <input type="range"
+                   name="speed_of_life"
+                   id="speed_of_life"
+                   step="1"
+                   min="200"
+                   max="5000"
+                   v-on:change="changeSpeed"
+                   v-default-value="game.speed_of_life">
+            <button :class="{hidden: !game.active}" class="button" id="start" v-on:click="start()">Start</button>
+            <button :class="{hidden: game.active}" class="button" id="stop" v-on:click="stop()">Stop</button>
+        </div>
     </div>
 </div>
-<script src="src/vue.js"></script>
+<script src="build/script.js"></script>
 </body>
 </html>

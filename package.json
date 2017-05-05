@@ -1,0 +1,20 @@
+{
+  "name": "DevChallenge11",
+  "version": "0.0.1",
+  "scripts": {
+    "webpack": "webpack --progress --colors --watch"
+  },
+  "dependencies": {
+    "vue": "^2.3.2",
+    "vue-default-value": "^1.0.2",
+    "vue-observer": "^1.0.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-core": "^6.24.1",
+    "babel-loader": "^7.0.0",
+    "babel-preset-env": "^1.4.0",
+    "extract-text-webpack-plugin": "^2.1.0",
+    "webpack": "^2.4.1"
+  }
+}

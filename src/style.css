@@ -11,9 +11,15 @@ body{
 #container {
     position:relative;
 }
+.cells_wrap{
+    width:100%;
+    height:100%;
+}
 .cell {
-    padding: 1px;
-    border: 1px solid #bfbfbf;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    box-shadow: 0 0 1px 1px #bfbfbf;
     width: 10px;
     height: 10px;
     position: absolute;
@@ -26,21 +32,24 @@ body{
 }
 .controls_wrap{
     position:fixed;
-    right: -150px;
+    right: 0;
     height: 100%;
     width: 150px;
     background-color: #ffffff;
     top:0;
     z-index:10;
+    border-left: 1px solid gray;
+    transform: translateX(100%);
+    transition: all 0.8s;
 }
 .controls_wrap.active{
-    right: 0;
+    transform: translateX(0);
 }
 .patterns_wrap{
     position:relative;
     width: 100%;
     height: 50%;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 .history_wrap{
     position: relative;
@@ -55,7 +64,7 @@ body{
     left: -20px;
     top: 50%;
 }
-.show-controls.active {
+.controls_wrap.active .show-controls {
     transform: rotateY(180deg);
 }
 .button{

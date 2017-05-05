@@ -2,21 +2,35 @@
  * Created by alex on 03.05.17.
  */
 
+var Vue = require('vue');
+var VueDefaultValue = require('vue-default-value');
+
+Vue.use(VueDefaultValue);
+
 let GameOfLife = function () {
-    this.cells = [];
+    this.cells = {};
+    this.aliveCells = {};
+    this.cellsXY = {};
     this.active = false;
     this.cells_count = 0;
-    this.Init(200);
+    this.speed_of_life = 500;
+    this.Init(100);
 };
+
 
 GameOfLife.prototype.Init = function (cells_count) {
     let j, i, row, cell;
     let self = this;
 
     for (i = 1; i <= cells_count; i++) {
+        if (self.cellsXY[i] === undefined) {
+            self.cellsXY[i] = {};
+        }
+
         for (j = 1; j <= cells_count; j++) {
             cell = new Cell(i, j);
-            self.cells.push(cell);
+            self.cells[cell.number] = cell;
+            self.cellsXY[i][j] = cell;
             self.cells_count++;
         }
     }
@@ -25,31 +39,33 @@ GameOfLife.prototype.Init = function (cells_count) {
 
 GameOfLife.prototype.Simulate = function () {
     let self = this;
-    setInterval(function () {
+    clearInterval(self.interval);
+    self.interval = setInterval(function () {
         if (self.active !== true){
             return false;
         }
-        console.log("sim");
         let i;
         self.toKill = [];
         self.toAlive = [];
-        for (i in self.cells) {
-            if (self.cells.hasOwnProperty(i)) {
-                self.CheckCell(self.cells[i]);
+        for (i in self.aliveCells) {
+            if (self.aliveCells.hasOwnProperty(i)) {
+                self.CheckCell(self.aliveCells[i], true);
             }
         }
         self.toKill.forEach(function(el){
             el.isAlive = false;
+            delete self.aliveCells[el.number];
         });
         self.toAlive.forEach(function(el){
             el.isAlive = true;
+            self.aliveCells[el.number] = el;
         });
-    }, 100);
+    }, self.speed_of_life);
 };
 
-GameOfLife.prototype.CheckCell = function (cell) {
+GameOfLife.prototype.CheckCell = function (cell, spread = false) {
     let self = this;
-    let arAdjacent = self.GetAliveAdjacent(cell.x, cell.y);
+    let arAdjacent = self.GetAliveAdjacent(cell.x, cell.y, spread);
     let count = arAdjacent.length;
 
     if (cell.isAlive) {
@@ -76,7 +92,8 @@ GameOfLife.prototype.CheckCell = function (cell) {
     }
 };
 
-GameOfLife.prototype.GetAliveAdjacent = function (x, y) {
+GameOfLife.prototype.GetAliveAdjacent = function (x, y, spread) {
+    let self = this;
     x = parseInt(x);
     y = parseInt(y);
     let arAdjacent = [];
@@ -84,41 +101,73 @@ GameOfLife.prototype.GetAliveAdjacent = function (x, y) {
     if (cell = this.GetCell(x - 1, y - 1)) {
         if (cell.isAlive) {
             arAdjacent.push(cell);
+        } else {
+            if (spread) {
+                self.CheckCell(cell);
+            }
         }
     }
     if (cell = this.GetCell(x - 1, y)) {
         if (cell.isAlive) {
             arAdjacent.push(cell);
+        } else {
+            if (spread) {
+                self.CheckCell(cell);
+            }
         }
     }
     if (cell = this.GetCell(x - 1, y + 1)) {
         if (cell.isAlive) {
             arAdjacent.push(cell);
+        } else {
+            if (spread) {
+                self.CheckCell(cell);
+            }
         }
     }
     if (cell = this.GetCell(x, y - 1)) {
         if (cell.isAlive) {
             arAdjacent.push(cell);
+        } else {
+            if (spread) {
+                self.CheckCell(cell);
+            }
         }
     }
     if (cell = this.GetCell(x, y + 1)) {
         if (cell.isAlive) {
             arAdjacent.push(cell);
+        } else {
+            if (spread) {
+                self.CheckCell(cell);
+            }
         }
     }
     if (cell = this.GetCell(x + 1, y - 1)) {
         if (cell.isAlive) {
             arAdjacent.push(cell);
+        } else {
+            if (spread) {
+                self.CheckCell(cell);
+            }
         }
     }
     if (cell = this.GetCell(x + 1, y)) {
         if (cell.isAlive) {
             arAdjacent.push(cell);
+        } else {
+            if (spread) {
+                self.CheckCell(cell);
+            }
         }
     }
     if (cell = this.GetCell(x + 1, y + 1)) {
         if (cell.isAlive) {
             arAdjacent.push(cell);
+        } else {
+            if (spread) {
+                self.CheckCell(cell);
+            }
         }
     }
 
@@ -127,22 +176,22 @@ GameOfLife.prototype.GetAliveAdjacent = function (x, y) {
 
 GameOfLife.prototype.GetCell = function (x, y) {
     let res;
-    this.cells.forEach(function(el){
-        if (el.x === x && el.y === y){
-            res = el;
-        }
-    });
-
-    return (res === undefined) ? res : false;
+    if (x >= this.cells_count || y >= this.cells_count || x<=0 || y<=0){
+        return false;
+    }
+    return this.cellsXY[x][y];
 };
 
-let Cell = function (x, y) {
+let totalCells = 0;
+
+let Cell = function (x, y, alive = false) {
     let cell = {};
 
     cell.x = x;
     cell.y = y;
     cell.style = `top: ${x * 10}px; left: ${y * 10}px`;
-    cell.isAlive = false;
+    cell.isAlive = alive;
+    cell.number = ++totalCells;
 
     return cell;
 };
@@ -152,11 +201,37 @@ let Game = new GameOfLife();
 let app = new Vue({
     el: "#container",
     data: {
-        cells: Game.cells
+        cells: Game.cells,
+        aliveCells: Game.aliveCells,
+        game: Game
     },
     methods: {
         switchAlive : function(el){
-            el.isAlive = !el.isAlive
+            el.isAlive = !el.isAlive;
+            if (el.isAlive){
+                this.aliveCells[el.number] = el;
+            } else {
+                delete this.aliveCells[el.number];
+            }
+        },
+        start: function(){
+            this.game.active = true;
+        },
+        stop: function(){
+            this.game.active = false;
+        },
+        changeSpeed: function(e){
+            this.game.speed_of_life = e.target.value;
+            this.game.Simulate();
         }
     }
 });
+
+(function(){
+    document.addEventListener("click", function(e){
+        let target = e.target;
+        if (target.classList.contains("show-controls")){
+            target.closest(".controls_wrap").classList.toggle("active");
+        }
+    });
+})();
